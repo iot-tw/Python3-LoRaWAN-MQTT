@@ -26,19 +26,19 @@ parser.add_option("-d", "--display-lcd", action="store_true",
 parser.add_option("-l", "--long-detail", action="store_true",
                   help="print detail JSON message")
 parser.add_option("-t", "--topic", action="store",
-                  dest="topic", default="client/200000020/200000020-GIOT-MAKER/#",
+                  dest="topic", default="GIOT-GW/#",
                   help="provide connection topic")
 parser.add_option("-i", "--ip", action="store",
-                  dest="host", default="52.193.146.103",
+                  dest="host", default="mqtt.lazyengineers.com",
                   help="sub from MQTT broker's IP ")
 parser.add_option("-u", "--user", action="store",
-                  dest="username", default="200000020",
+                  dest="username", default="lazyengineers",
                   help="sub from MQTT broker's username ")
 parser.add_option("-P", "--pw", action="store",
-                  dest="password", default="18923571",
+                  dest="password", default="lazyengineers",
                   help="sub from MQTT broker's password ")
 parser.add_option("-p", action="store",
-                  dest="port", default=80,
+                  dest="port", default=1883,
                   help="sub from MQTT broker's Port ")
 parser.add_option("-R","--downlink", action="store_true",
                   help="If payload is 'FF' print out Downlink Command")
