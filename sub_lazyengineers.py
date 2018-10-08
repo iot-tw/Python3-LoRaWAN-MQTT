@@ -1,8 +1,6 @@
 #! /usr/bin/python
-# -*- coding: utf8 -*-
 '''
-抓取giot MQTT Broker 的DL 資料,前提是要有申請GIoT賬戶
-可使用于台北市府物聯網，宜蘭縣府，新竹市府的PoC 環境。
+抓取lazyengineers 的DL 資料,它是免費的MQTT borker賬戶
 '''
 __author__ = "Marty Chao"
 __version__ = "1.0.2"
@@ -43,9 +41,7 @@ parser.add_option("-p", action="store",
 parser.add_option("-R","--downlink", action="store_true",
                   help="If payload is 'FF' print out Downlink Command")
 (options, args) = parser.parse_args()
-if options.display_lcd:
-    import Adafruit_CharLCD as LCD
-    lcd = LCD.Adafruit_CharLCDPlate()
+
 print ("MQTT broker is:" + options.host + ":" + str(options.port))
 print ("MQTT Topic is:" + options.topic)
 
@@ -75,10 +71,23 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    json_data = msg.payload
-    #print(json_data)
-    #print(msg.topic+" "+str(msg.payload))
-    if msg.topic[:11] == "GIOT-GW/DL/":
+    json_data = msg.payload.decode()
+    #print(msg.payload)
+    print(json_data)
+    print(msg.topic)
+    #print("-------------")
+    #print("data type:" + str(type(json_data)))
+    #print(type(msg.topic))
+    #print (" msg.topic 0-11 is:" + msg.topic[:11] )
+    #print (" msg.topic 0-17 is:" + msg.topic[:17] )
+    #print ("+++++++++++++")
+
+    print(type(msg.topic[:11]))
+    print(type("GIOT-GW/DL/"))
+
+    #if msg.topic[:11] == "GIOT-GW/DL/":
+    if msg.topic.startswith("GIOT-GW/DL/"):
+        print ("Topic is GIOT-GW/DL/ or not:" + msg.topic[:11])
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
         #sensor_value = bytes.fromhex(sensor_data).decode("utf-8")
@@ -86,6 +95,7 @@ def on_message(client, userdata, msg):
         sensor_txpara = json.loads(json_data)[0]['extra']['txpara']
 
     elif msg.topic[:11] == "GIOT-GW/UL/":
+        print ("Topic is GIOT-GW/UL/ or not:" + msg.topic[:11])
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
         #sensor_value = bytes.fromhex(sensor_data).decode("utf-8")
@@ -93,26 +103,16 @@ def on_message(client, userdata, msg):
         sensor_snr = json.loads(json_data)[0]['snr']
         sensor_rssi = json.loads(json_data)[0]['rssi']
         sensor_count = json.loads(json_data)[0]['frameCnt']
+        print ('Type:' + sensor_type + '\tMac:' + str(sensor_mac)[8:]
+              + '\tCount:' + str(sensor_count).rjust(6)
+              + '\tSNR:' + str(sensor_snr).rjust(4)
+              + '\tRSSI:' + str(sensor_rssi).rjust(4)
+              + '\tGWID:' + str(gwid_data).rjust(8))
     else:
         # print (msg.topic+" "+str(msg.payload))
         sensor_mac = '0000000000000000'
         sensor_data = '0000000000000000'
-    if "0a" == str(sensor_mac)[8:10]:
-        sensor_type = 'Asset Tracker'
-    elif "04" == str(sensor_mac)[8:10]:
-        sensor_type = 'Module Taipei'
-    elif "05" == str(sensor_mac)[8:10]:
-        sensor_type = 'Module Taiwan'
-    elif "14" == str(sensor_mac)[8:10]:
-        sensor_type = 'G76S EVK Taiwan'
-    elif "00" == str(sensor_mac)[8:10]:
-        sensor_type = 'Location Box '
-    elif "0d" == str(sensor_mac)[8:10]:
-        sensor_type = 'Parking Can  '
-    elif "02" == str(sensor_mac)[8:10]:
-        sensor_type = 'RS485 tranmit'
-    else:
-        sensor_type = 'Unknow Module'
+
     if msg.topic[:11] == 'GIOT-GW/UL/':
         if str(sensor_mac)[8:] == '0a010068' or str(sensor_mac)[8:] == '14011c65' :
             print('Type:' + sensor_type + '\tMac:' + str(sensor_mac)[8:]
@@ -125,18 +125,22 @@ def on_message(client, userdata, msg):
     elif msg.topic[:17] == 'GIOT-GW/DL-report':
         print('Response:' + msg.topic[18:] + '\tStatus:' + str(json.loads(json_data)['status']) + '\tID:' + json.loads(json_data)['dataId'])
     else:
-        print (msg.topic + msg.payload)
-    if options.display_lcd:
-        lcd.clear()
-        lcd.message(str(sensor_mac)[8:]+'C:'+str(sensor_count))
-        lcd.message('\nS/RSSI' + str(sensor_snr) + '/' + str(sensor_rssi))
+        #print (msg.topic + msg.payload)
+        print (" msg.topic 0-11 is:" + msg.topic[:11] )
+    #if options.display_lcd:
+    #    lcd.clear()
+    #    lcd.message(str(sensor_mac)[8:]+'C:'+str(sensor_count))
+    #    lcd.message('\nS/RSSI' + str(sensor_snr) + '/' + str(sensor_rssi))
 
-    # if gwid_data == "00001c497b48dc03" or gwid_data == "00001c497b48dc11":
-    if msg.topic[:7] == 'GIOT-GW' and msg.topic[:17] != 'GIOT-GW/DL-report':
+    print (" msg.topic 0-11 is:" + msg.topic[:11] )
+    print (" msg.topic 0-17 is:" + msg.topic[:17])
+    if msg.topic[:11] == 'GIOT-GW/DL/' : #and msg.topic[:17] != 'GIOT-GW/DL-report':
+        print("sssssssssssssssssssssssssssssssssss")
         try:
-            #print ('topic:' + msg.topic)
-            #print ("debug sensor_data:" + bytes.fromhex(sensor_data).decode("utf-8") + str(sensor_mac)[8:].upper())
-            if bytes.fromhex(sensor_data).decode("utf-8") == str(sensor_mac)[8:].upper() and options.downlink:
+            print ('option --R is worked')
+            print ('topic:' + msg.topic)
+            print (sensor_data.decode("hex") + str(sensor_mac)[8:].upper())
+            if sensor_data.decode("hex") == str(sensor_mac)[8:].upper() and options.downlink:
                 print('\x1b[6;30;42m' + 'pub_dl_local.py -i ' + options.host +' -m '+ str(sensor_mac)[8:]+ ' -g ' + str(gwid_data) + ' -c A' +'\x1b[0m')
                 lora_restart = raw_input('Stop MQTT subscribe?[Y/n]:') or "y"
                 if lora_restart == 'Y' or lora_restart == 'y':
