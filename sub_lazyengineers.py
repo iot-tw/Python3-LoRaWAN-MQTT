@@ -77,18 +77,18 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     json_data = msg.payload
     #print(json_data)
-    print(msg.topic+" "+str(msg.payload))
+    #print(msg.topic+" "+str(msg.payload))
     if msg.topic[:11] == "GIOT-GW/DL/":
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
-        sensor_value = sensor_data.decode("hex")
+        #sensor_value = bytes.fromhex(sensor_data).decode("utf-8")
         sensor_id = json.loads(json_data)[0]['id']
         sensor_txpara = json.loads(json_data)[0]['extra']['txpara']
 
     elif msg.topic[:11] == "GIOT-GW/UL/":
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
-        sensor_value = sensor_data.decode("hex")
+        #sensor_value = bytes.fromhex(sensor_data).decode("utf-8")
         gwid_data = json.loads(json_data)[0]['gwid']
         sensor_snr = json.loads(json_data)[0]['snr']
         sensor_rssi = json.loads(json_data)[0]['rssi']
@@ -114,11 +114,12 @@ def on_message(client, userdata, msg):
     else:
         sensor_type = 'Unknow Module'
     if msg.topic[:11] == 'GIOT-GW/UL/':
-        print('Type:' + sensor_type + '\tMac:' + str(sensor_mac)[8:]
-              + '\tCount:' + str(sensor_count).rjust(6)
-              + '\tSNR:' + str(sensor_snr).rjust(4)
-              + '\tRSSI:' + str(sensor_rssi).rjust(4)
-              + '\tGWID:' + str(gwid_data).rjust(8))
+        if str(sensor_mac)[8:] == '0a010068' or str(sensor_mac)[8:] == '14011c65' :
+            print('Type:' + sensor_type + '\tMac:' + str(sensor_mac)[8:]
+                + '\tCount:' + str(sensor_count).rjust(6)
+                + '\tSNR:' + str(sensor_snr).rjust(4)
+                + '\tRSSI:' + str(sensor_rssi).rjust(4)
+                + '\tGWID:' + str(gwid_data).rjust(8))
     elif msg.topic[:11] == 'GIOT-GW/DL/':
         print('Type:' + sensor_type + '\tMac:' + str(sensor_mac)[8:] + '\tMID:' + str(sensor_id) + '\tTXPara:' + str(sensor_txpara))
     elif msg.topic[:17] == 'GIOT-GW/DL-report':
@@ -133,14 +134,14 @@ def on_message(client, userdata, msg):
     # if gwid_data == "00001c497b48dc03" or gwid_data == "00001c497b48dc11":
     if msg.topic[:7] == 'GIOT-GW' and msg.topic[:17] != 'GIOT-GW/DL-report':
         try:
-            print ('topic:' + msg.topic)
-            print (sensor_data.decode("hex") + str(sensor_mac)[8:].upper())
-            if sensor_data.decode("hex") == str(sensor_mac)[8:].upper() and options.downlink:
+            #print ('topic:' + msg.topic)
+            #print ("debug sensor_data:" + bytes.fromhex(sensor_data).decode("utf-8") + str(sensor_mac)[8:].upper())
+            if bytes.fromhex(sensor_data).decode("utf-8") == str(sensor_mac)[8:].upper() and options.downlink:
                 print('\x1b[6;30;42m' + 'pub_dl_local.py -i ' + options.host +' -m '+ str(sensor_mac)[8:]+ ' -g ' + str(gwid_data) + ' -c A' +'\x1b[0m')
                 lora_restart = raw_input('Stop MQTT subscribe?[Y/n]:') or "y"
                 if lora_restart == 'Y' or lora_restart == 'y':
                     sys.exit()
-            print('     Payload: ' + sensor_data + ' \x1b[6;30;42m' + 'HEX2ASCII:' + '\x1b[0m' + sensor_data.decode("hex"))
+            print('     Payload: ' + sensor_data + ' \x1b[6;30;42m' + 'HEX2ASCII:' + '\x1b[0m' + bytes.fromhex(sensor_data).decode("utf-8"))
         except UnicodeDecodeError:
             print('     Payload: ' + sensor_data)
     if options.long_detail:
