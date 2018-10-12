@@ -1,13 +1,10 @@
 #! /usr/bin/python3
-# -*- coding: utf8 -*-
-''' Local MQTT Broker 的DL的script,前提是要有自己的GIoT Gateway。
-使用台北市府物聯網，宜蘭縣府，新竹市府的PoC 環境目前不支持DL。'''
 __author__ = "Marty Chao"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Marty Chao"
 __email__ = "marty@browan.com"
 __status__ = "Production"
-# Change log 1.0.1, init version
+
 import paho.mqtt.client as mqtt
 import socket
 import random
@@ -58,14 +55,14 @@ msg = '[{"macAddr":"00000000' + MAC + '",' \
     + '"data":"' + data + '",' \
     + '"id":"' + mid + '",' \
     + '"extra":{"port":2, "txpara":'+txpara+'}}]'
-print ("Broker:"+options.host+" Topic:"+topic+" Class Mode:"+options.classtype)
+print ("Broker:"+HostName+" Topic:"+topic+" Class Mode:"+options.classtype)
 print (msg)
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 try:
     client.username_pw_set(UserName, Password)
     client.connect(HostName, 1883, 60)
 except socket.error as e:
-    print ("Can't Connect to " + options.host)
+    print ("Can't Connect to " + HostName)
     print ("May use -i to specify broker server?")
 
 client.publish(topic, msg)

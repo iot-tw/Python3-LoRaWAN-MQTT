@@ -29,13 +29,13 @@ parser.add_option("-t", "--topic", action="store",
                   dest="topic", default="#",
                   help="provide connection topic")
 parser.add_option("-i", "--ip", action="store",
-                  dest="host", default="localhost",
+                  dest="host", default="mqtt.lazyengineers.com",
                   help="sub from MQTT broker's IP ")
 parser.add_option("-u", "--user", action="store",
-                  dest="username", default="admin",
+                  dest="username", default="lazyengineers",
                   help="sub from MQTT broker's username ")
 parser.add_option("-P", "--pw", action="store",
-                  dest="password", default="admin",
+                  dest="password", default="lazyengineers",
                   help="sub from MQTT broker's password ")
 parser.add_option("-p", action="store",
                   dest="port", default=1883,
@@ -75,20 +75,20 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    json_data = msg.payload
+    json_data = msg.payload.decode()
     # print(json_data)
     # print(msg.topic+" "+str(msg.payload))
     if msg.topic[:11] == "GIOT-GW/DL/":
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
-        sensor_value = sensor_data.decode("hex")
+        #sensor_value = bytes.fromhex(sensor_data).decode()
         sensor_id = json.loads(json_data)[0]['id']
         sensor_txpara = json.loads(json_data)[0]['extra']['txpara']
 
     elif msg.topic[:11] == "GIOT-GW/UL/":
         sensor_mac = json.loads(json_data)[0]['macAddr']
         sensor_data = json.loads(json_data)[0]['data']
-        sensor_value = sensor_data.decode("hex")
+        #sensor_value = bytes.fromhex(sensor_data).decode()
         gwid_data = json.loads(json_data)[0]['gwid']
         sensor_snr = json.loads(json_data)[0]['snr']
         sensor_rssi = json.loads(json_data)[0]['rssi']
@@ -122,22 +122,27 @@ def on_message(client, userdata, msg):
     elif msg.topic[:17] == 'GIOT-GW/DL-report':
         print('Response:' + msg.topic[18:] + '\tStatus:' + str(json.loads(json_data)['status']) + '\tID:' + json.loads(json_data)['dataId'])
     else:
-        print (msg.topic + msg.payload)
+        print (msg.topic + str(msg.payload))
     if options.display_lcd:
         lcd.clear()
         lcd.message(str(sensor_mac)[8:]+'C:'+str(sensor_count))
         lcd.message('\nS/RSSI' + str(sensor_snr) + '/' + str(sensor_rssi))
 
     # if gwid_data == "00001c497b48dc03" or gwid_data == "00001c497b48dc11":
-    if msg.topic[:7] == 'GIOT-GW' and msg.topic[:17] != 'GIOT-GW/DL-report':
+    if msg.topic[:11] == 'GIOT-GW/UL/' and msg.topic[:17] != 'GIOT-GW/DL-report':
         try:
             #print sensor_data.decode("hex") + str(sensor_mac)[8:].upper()
-            if sensor_data.decode("hex") == str(sensor_mac)[8:].upper() and options.downlink:
-                print('\x1b[6;30;42m' + 'pub_dl_local.py -i ' + options.host +' -m '+ str(sensor_mac)[8:]+ ' -g ' + str(gwid_data) + ' -c A' +'\x1b[0m')
-                lora_restart = raw_input('Stop MQTT subscribe?[Y/n]:') or "y"
+            if bytes.fromhex(sensor_data).decode() == str(sensor_mac)[8:].upper() and options.downlink:
+                print('\x1b[6;30;42m' + 'python3 pub_dl_local.py '
+                      + ' -i ' + options.host +' -m '+ str(sensor_mac)[8:]
+                      + ' -u ' + options.username
+                      + ' -P ' + options.password
+                      + ' -g ' + str(gwid_data)
+                      + ' -c A' +'\x1b[0m')
+                lora_restart = input('Stop MQTT subscribe?[Y/n]:') or "y"
                 if lora_restart == 'Y' or lora_restart == 'y':
                     sys.exit()
-            print('     Payload: ' + sensor_data + ' \x1b[6;30;42m' + 'HEX2ASCII:' + '\x1b[0m' + sensor_data.decode("hex"))
+            print('     Payload: ' + sensor_data + ' \x1b[6;30;42m' + 'HEX2ASCII:' + '\x1b[0m' + bytes.fromhex(sensor_data).decode())
         except UnicodeDecodeError:
             print('     Payload: ' + sensor_data)
     if options.long_detail:

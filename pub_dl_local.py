@@ -25,8 +25,17 @@ parser.add_option("-c", "--class", action="store", dest="classtype",
                   help="[A|a|C|c] for Class Mode.  Default is Class A\n \
                 Lowercase is unconfimed message,Uppercase is confirmed\n")
 parser.add_option("-i", "--ip", action="store", dest="host",
-                  default="localhost",
-                  help="IP for which MQTT Broker. Default is localhost")
+                  default="mqtt.lazyengineers.com",
+                  help="IP for which MQTT Broker. Default is  mqtt.lazyengineers.com")
+parser.add_option("-u", "--user", action="store",
+                  dest="username", default="lazyengineers",
+                  help="sub from MQTT broker's username ")
+parser.add_option("-P", "--pw", action="store",
+                  dest="password", default="lazyengineers",
+                  help="sub from MQTT broker's password ")
+parser.add_option("-p", action="store",
+                  dest="port", default=1883,
+                  help="sub from MQTT broker's Port ")
 parser.add_option("-g", "--gid", action="store", dest="GID",
                   default="00001c497b431fcd",
                   help="GID for DL GW. Default is 00001c497b431fcd")
@@ -60,7 +69,8 @@ print ("Broker:"+options.host+" Topic:"+topic+" Class Mode:"+options.classtype)
 print (msg)
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 try:
-    client.connect(options.host, 1883, 60)
+    client.username_pw_set(options.username, options.password)
+    client.connect(options.host, options.port, 60)
 except socket.error as e:
     print ("Can't Connect to " + options.host)
     print ("May use -i to specify broker server?")
