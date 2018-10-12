@@ -18,10 +18,10 @@ except ImportError:
     exit()
 import json
 # 下方資料是自動吐出json資料，不需要模組發送就會有資料
-HostName = "52.193.146.103"
+#HostName = "52.193.146.103"
 HostName = "mqtt.lazyengineers.com"
 PortNumber = 1883
-Topic = "client/200000017/200000017-GIOT-MAKER"
+#Topic = "client/200000017/200000017-GIOT-MAKER"
 Topic = "GIOT-GW/#"
 UserName = "lazyengineers"
 Password = "lazyengineers"
