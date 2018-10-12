@@ -1,15 +1,16 @@
 #! /usr/bin/python
 # -*- coding: utf8 -*-
 '''
-抓取Local MQTT Broker 的UL 資料,前提是要有自己的GIoT Gateway。
-使用台北市府物聯網，宜蘭縣府，新竹市府的PoC 環境是不同格式。
+抓取 MQTT Broker 的UL 資料,前提是要有自己的Gemtek's LoRaWAN Gateway。
+默认是抓取免费的MQTT broker lazyengineers
 '''
 __author__ = "Marty Chao"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __maintainer__ = "Marty Chao"
 __email__ = "marty@browan.com"
 __status__ = "Production"
 # Change log 1.0.1, support paho-mqtt 1.2
+# Change log 1.0.3, support lazyengineers and local mqtt broker
 
 import paho.mqtt.client as mqtt
 import json
@@ -26,22 +27,22 @@ parser.add_option("-d", "--display-lcd", action="store_true",
 parser.add_option("-l", "--long-detail", action="store_true",
                   help="print detail JSON message")
 parser.add_option("-t", "--topic", action="store",
-                  dest="topic", default="#",
+                  dest="topic", default="GIOT-GW/#",
                   help="provide connection topic")
 parser.add_option("-i", "--ip", action="store",
                   dest="host", default="mqtt.lazyengineers.com",
-                  help="sub from MQTT broker's IP ")
+                  help="sub from MQTT broker's IP, default is mqtt.lazyengineers.com ")
 parser.add_option("-u", "--user", action="store",
                   dest="username", default="lazyengineers",
-                  help="sub from MQTT broker's username ")
+                  help="sub from MQTT broker's username, default is lazyengineers ")
 parser.add_option("-P", "--pw", action="store",
                   dest="password", default="lazyengineers",
-                  help="sub from MQTT broker's password ")
+                  help="sub from MQTT broker's password, default is lazyengineers ")
 parser.add_option("-p", action="store",
                   dest="port", default=1883,
-                  help="sub from MQTT broker's Port ")
+                  help="sub from MQTT broker's Port, default is 1883")
 parser.add_option("-R","--downlink", action="store_true",
-                  help="If payload is 'FF' print out Downlink Command")
+                  help="If payload is 'FF' or same as Module's MAC print out Downlink Command")
 (options, args) = parser.parse_args()
 if options.display_lcd:
     import Adafruit_CharLCD as LCD
@@ -69,7 +70,7 @@ def on_connect(client, userdata, flags, rc):
     # client.subscribe(Topic)
     # client.subscribe("GIOT-GW/UL/+")
     # client.subscribe("GIOT-GW/UL/1C497B4321AA")
-    client.subscribe("#")
+    client.subscribe(options.topic)
     # GIOT-GW/DL/1C497B499010 [{"macAddr":"0000000004000476","data":"5678","id":"998877ffff0001","extra":{"port":2, "txpara":6}}]
     # GIOT-GW/DL-report/1C497B499010 {"dataId":"16CBD520C19162013CD6436CB330565E", "resp":"2016-11-30T15:02:40Z", "status":-1}
 
