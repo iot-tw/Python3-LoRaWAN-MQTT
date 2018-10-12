@@ -1,13 +1,12 @@
 #! /usr/bin/python
 # -*- coding: utf8 -*-
-''' Local MQTT Broker 的DL的script,前提是要有自己的GIoT Gateway。
-使用台北市府物聯網，宜蘭縣府，新竹市府的PoC 環境目前不支持DL。'''
 __author__ = "Marty Chao"
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 __maintainer__ = "Marty Chao"
 __email__ = "marty@browan.com"
 __status__ = "Production"
 # Change log 1.0.1, init version
+# Change log 1.0.2 default connect to lazyengineers
 import paho.mqtt.client as mqtt
 import socket
 import random

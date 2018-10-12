@@ -1,5 +1,12 @@
 #! /usr/bin/env python3
-# -*- coding: utf8 -*-
+__author__ = "Marty Chao"
+__version__ = "1.0.1"
+__maintainer__ = "Marty Chao"
+__email__ = "marty@browan.com"
+__status__ = "Production"
+# Change log 1.0.1 init version
+# Change log 1.0.2 default broker is lazyengineers
+
 import paho.mqtt.client as mqtt
 import socket
 import random
@@ -9,7 +16,7 @@ import time
 now_time = time.strftime("%Hc%Mc%S")
 usage = "usage: %prog [options] [data]\n \
     options: -d for sending data\n \
-             -i IP for which MQTT Broker. Default is localhost\n \
+             -i IP for which MQTT Broker. Default is lazyengineers\n \
              -m MAC for DL Node. Default is 04000476 \n \
              -g GID . Default is 1C497B499010 \n \
     e.g.: '%prog --data \"1234567890\" will UPLink to Broker"
@@ -18,8 +25,17 @@ parser.add_option("-d", "--data", action="store", dest="data",
                   default=now_time,
                   help="sending data")
 parser.add_option("-i", "--ip", action="store", dest="host",
-                  default="127.0.0.1",
+                  default="mqtt.lazyengineers.com",
                   help="setting Broker IP")
+parser.add_option("-P", "--pw", action = "store", dest="password",
+                  default = "lazyengineers",
+                  help = "sub from MQTT broker's password ")
+parser.add_option("-u", "--user", action="store", dest="username",
+                  default="lazyengineers",
+                  help="sub from MQTT broker's username ")
+parser.add_option("-p", action="store", dest="port",
+                  default=1883,
+                  help="sub from MQTT broker's Port ")
 parser.add_option("-g", "--gwid", action="store", dest="GID",
                   default="1C497B499010",
                   help="setting GID")
@@ -38,8 +54,6 @@ mid = str(random.randint(1, 99))
 GID = options.GID
 MAC = options.MAC
 topic = "GIOT-GW/UL/" + GID
-username = "lazyengineers"
-password = "lazyengineers"
 msg = '[{"channel":923125000, "sf":10, '\
     + '"time":"' + datetime.datetime.now().isoformat()[:19] + '", ' \
     + '"gwip":"192.168.88.1", '\
@@ -54,8 +68,8 @@ print("Broker:"+options.host+" Topic:"+topic)
 print(msg)
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 try:
-    client.username_pw_set(username, password)
-    client.connect(options.host, 1883, 60)
+    client.username_pw_set(options.username, options.password)
+    client.connect(options.host, options.port, 60)
 except socket.error as e:
     print("Can't Connect to " + options.host)
     print("May use -i to specify broker server?")
