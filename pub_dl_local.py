@@ -7,6 +7,7 @@ __email__ = "marty@browan.com"
 __status__ = "Production"
 # Change log 1.0.1, init version
 # Change log 1.0.2 default connect to lazyengineers
+# Change Log 1.0.3 format for PEP8
 import paho.mqtt.client as mqtt
 import socket
 import random
@@ -14,7 +15,8 @@ from optparse import OptionParser
 import time
 now_time = time.strftime("%Hc%Mc%S")
 usage = "usage: %prog [options] [data]\n \
-    e.g.: '%prog --data \"12345678901\" will downlink to module 04000476 by Localhost Broker,Class A confirmed"
+    e.g.: '%prog --data \"12345678901\" will downlink to module 04000476 \
+    by Localhost Broker,Class A confirmed"
 parser = OptionParser(usage)
 parser.add_option("-d", "--data", action="store", dest="data",
                   default=now_time,
@@ -25,7 +27,8 @@ parser.add_option("-c", "--class", action="store", dest="classtype",
                 Lowercase is unconfimed message,Uppercase is confirmed\n")
 parser.add_option("-i", "--ip", action="store", dest="host",
                   default="mqtt.lazyengineers.com",
-                  help="IP for which MQTT Broker. Default is  mqtt.lazyengineers.com")
+                  help="IP for which MQTT Broker. \
+                  Default is  mqtt.lazyengineers.com")
 parser.add_option("-u", "--user", action="store",
                   dest="username", default="lazyengineers",
                   help="sub from MQTT broker's username ")
@@ -45,7 +48,7 @@ parser.add_option("-m", "--mac", action="store", dest="MAC",
 if options.data:
     data = options.data
 mid = "".join(map(lambda t: format(t, "02X"), [random.randrange(256)
-              for x in range(16)]))
+                                               for x in range(16)]))
 GID = options.GID
 MAC = options.MAC
 topic = "GIOT-GW/DL/" + GID
@@ -63,16 +66,17 @@ elif options.classtype == "B":
 msg = '[{"macAddr":"00000000' + MAC + '",' \
     + '"data":"' + data + '",' \
     + '"id":"' + mid + '",' \
-    + '"extra":{"port":2, "txpara":'+txpara+'}}]'
-print ("Broker:"+options.host+" Topic:"+topic+" Class Mode:"+options.classtype)
-print (msg)
+    + '"extra":{"port":2, "txpara":' + txpara + '}}]'
+print("Broker:" + options.host + " Topic:" +
+      topic + " Class Mode:" + options.classtype)
+print(msg)
 client = mqtt.Client(protocol=mqtt.MQTTv31)
 try:
     client.username_pw_set(options.username, options.password)
     client.connect(options.host, options.port, 60)
 except socket.error as e:
-    print ("Can't Connect to " + options.host)
-    print ("May use -i to specify broker server?")
+    print("Can't Connect to " + options.host)
+    print("May use -i to specify broker server?")
 
 client.publish(topic, msg)
 client.disconnect()
