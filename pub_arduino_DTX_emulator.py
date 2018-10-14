@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 __author__ = "Marty Chao"
-__version__ = "1.0.1"
+__version__ = "1.0.3"
 __maintainer__ = "Marty Chao"
 __email__ = "marty@browan.com"
 __status__ = "Production"
 # Change log 1.0.1 init version
 # Change log 1.0.2 default broker is lazyengineers
+# Change log 1.0.3 format for PEP8
 
 import paho.mqtt.client as mqtt
 import socket
@@ -27,9 +28,9 @@ parser.add_option("-d", "--data", action="store", dest="data",
 parser.add_option("-i", "--ip", action="store", dest="host",
                   default="mqtt.lazyengineers.com",
                   help="setting Broker IP")
-parser.add_option("-P", "--pw", action = "store", dest="password",
-                  default = "lazyengineers",
-                  help = "sub from MQTT broker's password ")
+parser.add_option("-P", "--pw", action="store", dest="password",
+                  default="lazyengineers",
+                  help="sub from MQTT broker's password ")
 parser.add_option("-u", "--user", action="store", dest="username",
                   default="lazyengineers",
                   help="sub from MQTT broker's username ")
