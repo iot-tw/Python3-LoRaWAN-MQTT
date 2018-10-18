@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf8 -*-
 __author__ = "Marty Chao"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __maintainer__ = "Marty Chao"
 __email__ = "marty@browan.com"
 __status__ = "Production"
