@@ -14,7 +14,7 @@ import paho.mqtt.client as mqtt
 import json
 LAZY = "mqtt.lazyengineers.com"
 SELF = "192.168.88.198"
-HostName = GIOT
+HostName = LAZY
 PortNumber = 1883
 Topic = "GIOT-GW/UL/+"
 UserName = "lazyengineers"
