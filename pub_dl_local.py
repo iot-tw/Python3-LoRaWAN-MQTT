@@ -75,7 +75,7 @@ try:
     client.username_pw_set(options.username, options.password)
     client.connect(options.host, options.port, 60)
 except socket.error as e:
-    print("Can't Connect to " + options.host)
+    print(f"Can't Connect to {options.host}")
     print("May use -i to specify broker server?")
 
 client.publish(topic, msg)
