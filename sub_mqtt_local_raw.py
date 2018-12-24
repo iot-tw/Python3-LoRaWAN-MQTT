@@ -51,8 +51,8 @@ parser.add_option("-R", "--downlink", action="store_true",
 if options.display_lcd:
     import Adafruit_CharLCD as LCD
     lcd = LCD.Adafruit_CharLCDPlate()
-print("MQTT broker is:" + options.host + ":" + str(options.port))
-print("MQTT Topic is:" + options.topic)
+print(f"MQTT broker is: {options.host}:{str(options.port)}")
+print(f"MQTT Topic is: {options.topic}")
 
 # The callback for when the client receives a CONNACK response from the server.
 
